@@ -6,8 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import android.app.PendingIntent
+import android.content.IntentFilter
 import android.os.Bundle
+import android.os.Handler
+import android.os.SystemClock
 import android.util.Log
+import java.util.*
 
 
 /**
@@ -21,17 +25,27 @@ class ClockWidgetProvider : AppWidgetProvider() {
 
     val TAG = "ClockWidgetProvider"
 
+    private val mHandler = Handler()
+
+
     override fun onReceive(context: Context?, intent: Intent?) {
-        super.onReceive(context, intent)
         Log.i(TAG, "小部件提供程序接收到广播")
+        super.onReceive(context, intent)
+
+        if(Intent.ACTION_TIME_CHANGED == intent?.action) {
+            context?.sendBroadcast(Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE))
+        }
     }
 
-    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+    override fun onUpdate(context: Context?, appWidgetManager: AppWidgetManager?, appWidgetIds: IntArray?) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
+
+        val c = Calendar.getInstance()
+
         Log.i(TAG, "小部件更新")
         // 一个App Widget提供程序为一个App Widget提供支持，但是一个App Widget却可以在多个地方添加，
         // 每一个显示的App Widget视图有一个id，如果多个地方添加将会有多个id，这里循环对每一个视图进行更新
-        appWidgetIds.forEach { appWidgetId ->
+        appWidgetIds?.forEach { appWidgetId ->
             // 创建App Widget点击事件意图（说明：如果不需要实现点击事件，可以不定义此项）
             val timePendingIntent: PendingIntent = Intent(context, MainActivity::class.java)
                 .let { intent ->
@@ -43,18 +57,24 @@ class ClockWidgetProvider : AppWidgetProvider() {
             }
 
             // 获取App Widget的视图布局
-            val views: RemoteViews = RemoteViews(context.packageName,R.layout.clock_widget).apply {
+            val views: RemoteViews = RemoteViews(context?.packageName, R.layout.clock_widget).apply {
                 // 设置点击事件意图(说明：如果App Widget内部有多个控件点击事件，可以在此添加多个控件的点击事件)
                 setOnClickPendingIntent(R.id.tv_time, timePendingIntent)
                 setOnClickPendingIntent(R.id.tv_date, datePendingIntent)
+
+
+
+                setTextViewText(R.id.tv_time, "${c[Calendar.HOUR_OF_DAY]}:${String.format("%02d", c[Calendar.MINUTE])}")
+                setTextViewText(R.id.tv_date, "${c[Calendar.YEAR]}/${String.format("%02d", c[Calendar.MONTH])}/${String.format("%02d", c[Calendar.DAY_OF_MONTH])}")
             }
 
-            Log.e(TAG, "updatePeriodMillis: ${appWidgetManager.getAppWidgetInfo(appWidgetId).updatePeriodMillis}")
-
-
             // 通知AppWidgetManager更新当前的App Widget
-            appWidgetManager.updateAppWidget(appWidgetId, views)
+            appWidgetManager?.updateAppWidget(appWidgetId, views)
         }
+
+        Handler().postDelayed({
+            onUpdate(context, appWidgetManager, appWidgetIds)
+        }, 60000 - c[Calendar.SECOND] * 1000L)
     }
 
     override fun onAppWidgetOptionsChanged(context: Context, appWidgetManager: AppWidgetManager,
