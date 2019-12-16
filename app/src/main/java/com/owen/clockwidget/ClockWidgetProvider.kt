@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import android.app.PendingIntent
+import android.app.Service
 import android.content.ComponentName
 import android.content.IntentFilter
 import android.os.Bundle
@@ -38,10 +39,9 @@ class ClockWidgetProvider : AppWidgetProvider() {
         }
     }
 
+
     override fun onUpdate(context: Context?, appWidgetManager: AppWidgetManager?, appWidgetIds: IntArray?) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
-
-
         Log.i(TAG, "小部件更新")
         // 一个App Widget提供程序为一个App Widget提供支持，但是一个App Widget却可以在多个地方添加，
         // 每一个显示的App Widget视图有一个id，如果多个地方添加将会有多个id，这里循环对每一个视图进行更新
@@ -51,11 +51,6 @@ class ClockWidgetProvider : AppWidgetProvider() {
             appWidgetManager?.updateAppWidget(appWidgetId, buildView(context))
 
         }
-
-        val c = Calendar.getInstance()
-        Handler().postDelayed({
-            onUpdate(context, appWidgetManager, appWidgetIds)
-        }, 60000 - c[Calendar.SECOND] * 1000L)
     }
 
     override fun onAppWidgetOptionsChanged(context: Context, appWidgetManager: AppWidgetManager,
@@ -97,11 +92,8 @@ class ClockWidgetProvider : AppWidgetProvider() {
             // 获取App Widget的视图布局
             return RemoteViews(context?.packageName, R.layout.clock_widget).apply {
                 // 设置点击事件意图(说明：如果App Widget内部有多个控件点击事件，可以在此添加多个控件的点击事件)
-                setOnClickPendingIntent(R.id.tv_time, timePendingIntent)
-                setOnClickPendingIntent(R.id.tv_date, datePendingIntent)
-
-                setTextViewText(R.id.tv_time, "${c[Calendar.HOUR_OF_DAY]}:${String.format("%02d", c[Calendar.MINUTE])}")
-                setTextViewText(R.id.tv_date, "${c[Calendar.YEAR]}/${String.format("%02d", c[Calendar.MONTH])}/${String.format("%02d", c[Calendar.DAY_OF_MONTH])}")
+                setOnClickPendingIntent(R.id.timeText, timePendingIntent)
+                setOnClickPendingIntent(R.id.dateText, datePendingIntent)
             }
         }
 

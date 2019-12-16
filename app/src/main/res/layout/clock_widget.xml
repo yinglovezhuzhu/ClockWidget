@@ -2,24 +2,27 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <TextView
-        android:id="@+id/tv_time"
+    <TextClock
+        android:id="@+id/timeText"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:format12Hour="hh:mm"
+        android:format24Hour="HH:mm"
+        android:gravity="center"
+        android:textColor="@android:color/black"
+        android:textSize="42sp"
+        android:textStyle="bold"/>
+    <TextClock
+        android:id="@+id/dateText"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:textSize="50sp"
+        android:format12Hour="yyyy/MM/dd"
+        android:format24Hour="yyyy/MM/dd"
         android:gravity="center"
         android:textColor="@android:color/black"
-        android:background="@android:color/holo_blue_bright"
-        android:text="08:00"/>
-    <TextView
-        android:id="@+id/tv_date"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:gravity="center"
-        android:textColor="@android:color/black"
-        android:background="@android:color/holo_blue_bright"
-        android:text="2019/12/06"/>
+        android:textSize="18sp"/>
+
 
 </LinearLayout>
