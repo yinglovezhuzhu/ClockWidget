@@ -94,6 +94,8 @@ class ClockWidgetProvider : AppWidgetProvider() {
                 // 设置点击事件意图(说明：如果App Widget内部有多个控件点击事件，可以在此添加多个控件的点击事件)
                 setOnClickPendingIntent(R.id.timeText, timePendingIntent)
                 setOnClickPendingIntent(R.id.dateText, datePendingIntent)
+
+
             }
         }
 

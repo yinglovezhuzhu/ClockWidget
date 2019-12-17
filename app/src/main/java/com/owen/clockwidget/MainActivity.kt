@@ -1,12 +1,13 @@
 package com.owen.clockwidget
 
-import android.content.Intent
-import android.content.IntentFilter
+import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
+import android.widget.TextClock
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_main.*
-import java.time.Clock
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,14 +17,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        btn.setOnClickListener(){
-            Log.i(TAG, "Send broadcast-----")
-            Intent().also { intent ->
-                intent.action = "com.owen.clockwidget.DaemonDie"
-                intent.`package` = packageName
-                sendBroadcast(intent)
-            }
-        }
+        val textClock = findViewById<TextClock>(R.id.timeText)
+
+        val ss = SpannableString("HH:mm:ss")
+
+        ss.setSpan(ForegroundColorSpan(Color.RED), 0, 6, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+        ss.setSpan(ForegroundColorSpan(Color.GREEN), 6, 7, Spannable.SPAN_INCLUSIVE_INCLUSIVE)
+        ss.setSpan(RelativeSizeSpan(0.5f), 6, 7, Spannable.SPAN_INCLUSIVE_INCLUSIVE)
+
+        textClock.format24Hour = ss
     }
 
     override fun onDestroy() {
