@@ -9,9 +9,14 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.ComponentName
 import android.content.IntentFilter
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.SystemClock
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
 import android.util.Log
 import java.util.*
 
@@ -32,6 +37,11 @@ class ClockWidgetProvider : AppWidgetProvider() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         Log.i(TAG, "小部件提供程序接收到广播")
+
+        if(AppWidgetManager.ACTION_APPWIDGET_UPDATE == intent?.action) {
+            val extras = intent.extras
+            Log.i(TAG, "Extras size: ${extras?.size()}")
+        }
         super.onReceive(context, intent)
 
         if(Intent.ACTION_TIME_CHANGED == intent?.action) {
@@ -48,7 +58,7 @@ class ClockWidgetProvider : AppWidgetProvider() {
         appWidgetIds?.forEach { appWidgetId ->
             // 创建App Widget点击事件意图（说明：如果不需要实现点击事件，可以不定义此项）
             // 通知AppWidgetManager更新当前的App Widget
-            appWidgetManager?.updateAppWidget(appWidgetId, buildView(context))
+            appWidgetManager?.updateAppWidget(appWidgetId, buildView(appWidgetId, context))
 
         }
     }
@@ -78,8 +88,11 @@ class ClockWidgetProvider : AppWidgetProvider() {
 
 
     companion object {
-        fun buildView(context: Context?): RemoteViews {
+        fun buildView(appWidgetId: Int, context: Context?): RemoteViews {
             val c = Calendar.getInstance()
+            val sp = context?.getSharedPreferences("sp_widget_config", Context.MODE_PRIVATE)
+            val bgColor = sp?.getInt("${appWidgetId}_bg_color", Color.argb(0xff, 0xff, 0xff, 0xff))
+            val bgAlpha = sp?.getInt("${appWidgetId}_bg_alpha", 100)
             val timePendingIntent: PendingIntent = Intent(context, MainActivity::class.java)
                 .let { intent ->
                     PendingIntent.getActivity(context, 0, intent, 0)
@@ -95,13 +108,22 @@ class ClockWidgetProvider : AppWidgetProvider() {
                 setOnClickPendingIntent(R.id.timeText, timePendingIntent)
                 setOnClickPendingIntent(R.id.dateText, datePendingIntent)
 
+                val alpha = (bgAlpha?: 100).div(100f) * 256
+                val color = bgColor?: Color.argb(0xff, 0xff, 0xff, 0xff)
 
+                setInt(R.id.content, "setBackgroundColor", Color.argb(alpha.toInt(), Color.red(color), Color.green(color), Color.blue(color)))
             }
         }
 
         fun updateWidget(context: Context?) {
             val appWidgetManager = AppWidgetManager.getInstance(context)
-            appWidgetManager.updateAppWidget(ComponentName(context!!, ClockWidgetProvider::class.java), buildView(context))
+
+            val componentName = ComponentName(context!!, ClockWidgetProvider::class.java)
+
+            val appWidgetIds = appWidgetManager.getAppWidgetIds(componentName)
+            appWidgetIds?.forEach {
+                appWidgetManager.updateAppWidget(componentName, buildView(it, context))
+            }
         }
     }
 }

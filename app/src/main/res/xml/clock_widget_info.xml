@@ -8,5 +8,6 @@
     android:previewImage="@drawable/ic_gift"
     android:initialLayout="@layout/clock_widget"
     android:resizeMode="horizontal|vertical"
-    android:widgetCategory="home_screen">
+    android:widgetCategory="home_screen"
+    android:configure="com.owen.clockwidget.ConfigActivity">
 </appwidget-provider>
