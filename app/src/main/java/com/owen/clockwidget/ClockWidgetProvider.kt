@@ -18,6 +18,11 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.util.Log
+import android.view.KeyEvent
+import androidx.core.graphics.alpha
+import androidx.core.graphics.blue
+import androidx.core.graphics.green
+import androidx.core.graphics.red
 import java.util.*
 
 
@@ -108,11 +113,13 @@ class ClockWidgetProvider : AppWidgetProvider() {
                 setOnClickPendingIntent(R.id.timeText, timePendingIntent)
                 setOnClickPendingIntent(R.id.dateText, datePendingIntent)
 
-                val alpha = (bgAlpha?: 100).div(100f) * 256
+                val alpha = (bgAlpha?: 100).div(100f) * 0xFF
                 val color = bgColor?: Color.argb(0xff, 0xff, 0xff, 0xff)
 
-                setInt(R.id.content, "setBackgroundColor", Color.argb(alpha.toInt(), Color.red(color), Color.green(color), Color.blue(color)))
+
+                setInt(R.id.content, "setBackgroundColor", Color.argb(alpha.toInt(), color.red, color.green, color.blue))
             }
+
         }
 
         fun updateWidget(context: Context?) {
